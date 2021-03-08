@@ -542,6 +542,7 @@ INT_PTR CALLBACK main_dproc(HWND hwnd, UINT msg, WPARAM wp, LPARAM lp)
 						{
 							config.replay_file = filename;
 							SetWindowText(GetDlgItem(hwnd, REPLAY_PATH), config.replay_file.c_str());
+							SetWindowText(GetDlgItem(hwnd, AVI_PATH), (config.replay_file + ".mp4").c_str());
 							
 							config.replay_dir = config.replay_file;
 							config.replay_dir.erase(config.replay_dir.find_last_of('\\'));
