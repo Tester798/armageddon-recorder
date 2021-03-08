@@ -24,40 +24,22 @@
 
 const ffmpeg_format video_formats[] = {
 	{ "None", NULL, NULL },
-	
-	{ "H.264 (Lex preset; looks perfect w/ small file size)", "libx264", "-x264opts no-scenecut:weightp=2:rc-lookahead=250:no-fast-pskip:aq-mode=2:direct=auto:trellis=2:partitions=all:b-adapt=2:bframes=16:me=tesa:subme=11:merange=48:keyint=600:min-keyint=600:crf=14:colormatrix=bt470bg:fullrange=on -preset placebo -pix_fmt yuv444p" },
-	{ "H.264 (lossless)", "libx264rgb", "-pix_fmt bgr24 -qp 0" },
-	{ "ZMBV (lossless, 256 colours)", "zmbv", NULL },
-	{ "Raw video (Uncompressed)", "rawvideo", "-pix_fmt bgr24" },
+	{ "H264", "libx264", "-crf 21 -preset veryfast" },
 	{ NULL }
 };
 
 const ffmpeg_format audio_formats[] = {
-	{ "AAC", "libvo_aacenc", NULL },
-	{ "Vorbis (libvorbis default quality)", "libvorbis", NULL },
-	{ "Vorbis (Lex preset; sounds perfect w/ small file size)", "libvorbis", "-aq 0.25" },
-	{ "FLAC", "flac", NULL },
-	{ "16-bit PCM (Uncompressed)", "pcm_s16le", NULL },
+	{ "AAC", "aac", "-b:a 128k" },
 	{ NULL }
 };
 
 const container_format container_formats[] = {
 	{
-		"mkv",
-		"Matroska Multimedia Container",
-		
-		(const char*[]){ "libx264", "libx264rgb", "zmbv", "rawvideo", NULL },
-		(const char*[]){ "libvo_aacenc", "libvorbis", "flac", "pcm_s16le", NULL }
+		"mp4",
+		"MP4",
+		(const char*[]){ "libx264", NULL },
+		(const char*[]){ "aac", NULL }
 	},
-	
-	{
-		"avi",
-		"AVI",
-		
-		(const char*[]){ "rawvideo",  NULL },
-		(const char*[]){ "pcm_s16le", NULL }
-	},
-	
 	{ NULL }
 };
 
@@ -119,7 +101,7 @@ static void append_codec(std::string &cmdline, const char *ct, const ffmpeg_form
 	if(format.extra)
 	{
 		cmdline.append(" ");
-		cmdline.append(video_formats[config.video_format].extra);
+		cmdline.append(format.extra);
 	}
 }
 
@@ -133,10 +115,10 @@ std::string ffmpeg_cmdline()
 	
 	cmdline.append(std::string(" -i \"") + audio_in + "\"");
 	
-	append_codec(cmdline, " -vcodec ", video_formats[config.video_format]);
-	append_codec(cmdline, " -acodec ", audio_formats[config.audio_format]);
+	append_codec(cmdline, " -c:v ", video_formats[config.video_format]);
+	append_codec(cmdline, " -c:a ", audio_formats[config.audio_format]);
 	
-	cmdline.append(std::string(" \"") + video_out + "\"");
+	cmdline.append(std::string(" -pix_fmt yuv420p \"") + video_out + "\"");
 	
 	return cmdline;
 }
