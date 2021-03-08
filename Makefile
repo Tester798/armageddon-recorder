@@ -25,7 +25,7 @@ WINDRES ?= $(shell \
 )
 
 INCLUDES := -D_WIN32_WINNT=0x0501 -DWINVER=0x0501 -D_WIN32_IE=0x0600 -I./include/ -I../directx/
-LIBS     := -static-libgcc -static-libstdc++ -lcomctl32 -lcomdlg32 -lole32 -lsndfile -lversion
+LIBS     := -static -static-libgcc -static-libstdc++ -L./include/ -lcomctl32 -lcomdlg32 -lole32 -lsndfile.dll -lversion
 
 CFLAGS   := -Wall -std=c99
 CXXFLAGS := -Wall -std=c++0x
@@ -36,25 +36,28 @@ OBJS := src/main.o src/resource.o src/audio.o src/reg.o src/encode.o \
 HDRS := src/main.hpp src/resource.h src/audio.hpp src/reg.hpp src/encode.hpp \
 	src/capture.hpp src/ui.hpp src/resample.hpp
 
-all: armageddon-recorder.exe dsound.dll dump.exe
+all: armageddon-mp4-recorder.exe dsound.dll dump.exe
 
 clean:
-	rm -f armageddon-recorder.exe $(OBJS)
+	rm -f armageddon-mp4-recorder.exe $(OBJS)
 	rm -f dsound.dll src/ds-capture.o
 	rm -f dump.exe src/dump.o
 
-armageddon-recorder.exe: $(OBJS)
-	$(CXX) $(CXXFLAGS) -mwindows -o armageddon-recorder.exe $(OBJS) $(LIBS)
-	strip -s armageddon-recorder.exe
+armageddon-mp4-recorder.exe: $(OBJS)
+	$(CXX) $(CXXFLAGS) -mwindows -o armageddon-mp4-recorder.exe $(OBJS) $(LIBS)
+	strip -s armageddon-mp4-recorder.exe
+	strip -s libsndfile-1.dll
 
 dump.exe: src/dump.o
-	$(CXX) $(CXXFLAGS) -o $@ $< -static-libgcc -static-libstdc++ -lsndfile
+	$(CXX) $(CXXFLAGS) -o $@ $< $(LIBS)
+	strip -s dump.exe
 
 src/resource.o: src/resource.rc src/resource.h
 	$(WINDRES) src/resource.rc src/resource.o
 
 dsound.dll: src/ds-capture.o
-	$(CC) $(CFLAGS) -Wl,--enable-stdcall-fixup -shared -o $@ $^
+	$(CC) $(CFLAGS) -static -static-libgcc -static-libstdc++ -Wl,--enable-stdcall-fixup -shared -o $@ $^
+	strip -s dsound.dll
 
 src/ds-capture.o: src/ds-capture.c
 	$(CC) $(CFLAGS) $(INCLUDES) -c -o $@ $<
