@@ -156,6 +156,8 @@ bool ffmpeg_run()
 	STARTUPINFO sinfo;
 	memset(&sinfo, 0, sizeof(sinfo));
 	sinfo.cb = sizeof(sinfo);
+	sinfo.dwFlags = STARTF_USESHOWWINDOW;
+	sinfo.wShowWindow = SW_MINIMIZE;
 	
 	PROCESS_INFORMATION pinfo;
 	
