@@ -184,8 +184,10 @@ bool start_capture()
 	
 	/* Environment variables used by dsound.dll */
 	
-	SetEnvironmentVariable("AREC_FRAME_PREFIX",   std::string(config.capture_dir + "\\" FRAME_PREFIX).c_str());
-	SetEnvironmentVariable("DSOUND_CAPTURE_FILE", std::string(config.capture_dir + "\\" FRAME_PREFIX "audio.dat").c_str());
+	SetEnvironmentVariable("WA_CAPTURE_FOLDER_MAIN",    std::string(wa_path + "\\User\\Capture").c_str());
+	SetEnvironmentVariable("WA_CAPTURE_FOLDER_CURRENT", std::string(config.capture_dir).c_str());
+	SetEnvironmentVariable("AREC_FRAME_PREFIX",         std::string(config.capture_dir + "\\" FRAME_PREFIX).c_str());
+	SetEnvironmentVariable("DSOUND_CAPTURE_FILE",       std::string(config.capture_dir + "\\" FRAME_PREFIX "audio.dat").c_str());
 	
 	if(config.load_wormkit_dlls)
 	{

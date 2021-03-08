@@ -584,6 +584,12 @@ BOOL WINAPI DllMain(HINSTANCE me, DWORD why, LPVOID res)
 {
 	if(why == DLL_PROCESS_ATTACH)
 	{
+		char *capture_folder_main = getenv("WA_CAPTURE_FOLDER_MAIN");
+		_mkdir(capture_folder_main);
+
+		char *capture_folder_current = getenv("WA_CAPTURE_FOLDER_CURRENT");
+		_mkdir(capture_folder_current);
+
 		char path[1024];
 		
 		/* Load the system dsound.dll and get the real DirectSoundCreate
