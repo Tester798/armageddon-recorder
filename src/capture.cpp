@@ -134,22 +134,25 @@ bool start_capture()
 	delete_capture();
 	CreateDirectory(config.capture_dir.c_str(), NULL);
 	
-	/* Rename any existing dsound.dll so we can restore it later. */
-	
-	if(file_exists(DSOUND_PATH) && !dll_is_dsound_wrapper(DSOUND_PATH) && !MoveFileEx(DSOUND_PATH, DSOUND_BACKUP, MOVEFILE_REPLACE_EXISTING))
+	if(config.audio_format > 0)
 	{
-		show_error(std::string("Cannot rename existing dsound.dll: ") + w32_error(GetLastError()));
-		return false;
-	}
-	
-	/* Install wrapper dsound.dll to hook the DirectSound API and provide
-	 * WormKit support.
-	*/
-	
-	if(!CopyFile(std::string(arec_directory() + "\\dsound.dll").c_str(), DSOUND_PATH, FALSE))
-	{
-		show_error(std::string("Cannot copy dsound.dll to the WA directory: ") + w32_error(GetLastError()));
-		return false;
+		/* Rename any existing dsound.dll so we can restore it later. */
+		
+		if(file_exists(DSOUND_PATH) && !dll_is_dsound_wrapper(DSOUND_PATH) && !MoveFileEx(DSOUND_PATH, DSOUND_BACKUP, MOVEFILE_REPLACE_EXISTING))
+		{
+			show_error(std::string("Cannot rename existing dsound.dll: ") + w32_error(GetLastError()));
+			return false;
+		}
+		
+		/* Install wrapper dsound.dll to hook the DirectSound API and provide
+		 * WormKit support.
+		*/
+		
+		if(!CopyFile(std::string(arec_directory() + "\\dsound.dll").c_str(), DSOUND_PATH, FALSE))
+		{
+			show_error(std::string("Cannot copy dsound.dll to the WA directory: ") + w32_error(GetLastError()));
+			return false;
+		}		
 	}
 	
 	/* Change the WA options based on the capture settings. */
@@ -273,6 +276,11 @@ void delete_capture()
 
 void restore_wa_install()
 {
+	if(config.audio_format == 0)
+	{
+		return;
+	}
+
 	if(file_exists(DSOUND_PATH))
 	{
 		if(dll_is_dsound_wrapper(DSOUND_PATH))

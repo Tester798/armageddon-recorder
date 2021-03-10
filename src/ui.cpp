@@ -258,21 +258,27 @@ INT_PTR CALLBACK prog_dproc(HWND hwnd, UINT msg, WPARAM wp, LPARAM lp)
 			
 			finish_capture();
 			
-			log_push("Creating audio file...\r\n");
+			if(config.audio_format > 0)
+			{
+				log_push("Creating audio file...\r\n");
+				
+				HANDLE at = CreateThread(NULL, 0, &audio_gen_thread, NULL, 0, NULL);
+				assert(at);
+				
+				CloseHandle(at);
 			
-			HANDLE at = CreateThread(NULL, 0, &audio_gen_thread, NULL, 0, NULL);
-			assert(at);
-			
-			CloseHandle(at);
-			
-			state = s_audio_gen;
+				state = s_audio_gen;
+			}
+			else{
+				PostMessage(hwnd, WM_AUDIO_DONE, 0, 0);
+			}
 			
 			return TRUE;
 		}
 		
 		case WM_AUDIO_DONE:
 		{
-			if(config.video_format > 0)
+			if(config.video_format > 0 || config.audio_format > 0)
 			{
 				log_push("Starting encoder...\r\n");
 				

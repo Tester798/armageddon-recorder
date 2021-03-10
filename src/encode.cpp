@@ -24,11 +24,12 @@
 
 const ffmpeg_format video_formats[] = {
 	{ "None", NULL, NULL },
-	{ "H264", "libx264", "-crf 21 -preset veryfast" },
+	{ "H264", "libx264", "-crf 21 -preset veryfast -pix_fmt yuv420p" },
 	{ NULL }
 };
 
 const ffmpeg_format audio_formats[] = {
+	{ "None", NULL, NULL },
 	{ "AAC", "aac", "-b:a 128k" },
 	{ NULL }
 };
@@ -84,7 +85,7 @@ std::vector<int> get_valid_containers(int video_format, int audio_format)
 		const char **vc_ok = container_formats[i].video_formats;
 		const char **ac_ok = container_formats[i].audio_formats;
 		
-		if(test_codec(vc_ok, video_codec) && test_codec(ac_ok, audio_codec))
+		if((video_format > 0 && test_codec(vc_ok, video_codec)) || (audio_format > 0 && test_codec(ac_ok, audio_codec)))
 		{
 			ret.push_back(i);
 		}
@@ -111,14 +112,29 @@ std::string ffmpeg_cmdline()
 	std::string audio_in  = config.capture_dir + "\\" + FRAME_PREFIX + "audio.wav";
 	std::string video_out = config.video_file;
 	
-	std::string cmdline = "ffmpeg.exe -threads " + to_string(config.max_enc_threads) + " -y -r " + to_string(config.frame_rate) + " -i \"" + frames_in + "\"";
+	std::string cmdline = "ffmpeg.exe -threads " + to_string(config.max_enc_threads) + " -y -r " + to_string(config.frame_rate);
+
+	if(config.video_format > 0)
+	{
+		cmdline.append(" -i \"" + frames_in + "\"");
+	}
 	
-	cmdline.append(std::string(" -i \"") + audio_in + "\"");
+	if(config.audio_format > 0)
+	{
+		cmdline.append(" -i \"" + audio_in + "\"");
+	}
+
+	if(config.video_format > 0)
+	{
+		append_codec(cmdline, " -c:v ", video_formats[config.video_format]);
+	}
+
+	if(config.audio_format > 0)
+	{
+		append_codec(cmdline, " -c:a ", audio_formats[config.audio_format]);
+	}
 	
-	append_codec(cmdline, " -c:v ", video_formats[config.video_format]);
-	append_codec(cmdline, " -c:a ", audio_formats[config.audio_format]);
-	
-	cmdline.append(std::string(" -pix_fmt yuv420p \"") + video_out + "\"");
+	cmdline.append(std::string(" -movflags +faststart \"") + video_out + "\"");
 	
 	return cmdline;
 }

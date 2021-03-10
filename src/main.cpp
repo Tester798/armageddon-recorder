@@ -480,15 +480,15 @@ INT_PTR CALLBACK main_dproc(HWND hwnd, UINT msg, WPARAM wp, LPARAM lp)
 						
 						config.video_file = get_window_string(GetDlgItem(hwnd, AVI_PATH));
 						
-						if(config.video_format == 0 && config.do_cleanup)
+						if(config.video_format == 0 && config.audio_format == 0 && config.do_cleanup)
 						{
-							MessageBox(hwnd, "You've chosen to not create a video file and delete frames/audio when finished. You probably don't want this.", NULL, MB_OK | MB_ICONWARNING);
+							MessageBox(hwnd, "You've chosen to not create a file and delete frames/audio when finished. You probably don't want this.", NULL, MB_OK | MB_ICONWARNING);
 							break;
 						}
 						
-						if(config.video_format > 0 && config.video_file.empty())
+						if((config.video_format > 0 || config.audio_format > 0) && config.video_file.empty())
 						{
-							MessageBox(hwnd, "Output video filename is required", NULL, MB_OK | MB_ICONERROR);
+							MessageBox(hwnd, "Output filename is required", NULL, MB_OK | MB_ICONERROR);
 							break;
 						}
 						
@@ -642,15 +642,16 @@ INT_PTR CALLBACK main_dproc(HWND hwnd, UINT msg, WPARAM wp, LPARAM lp)
 					
 					VIDEO_ENABLE:
 					
-					EnableWindow(GetDlgItem(hwnd, AUDIO_FORMAT_MENU), config.video_format > 0);
-					EnableWindow(GetDlgItem(hwnd, AVI_PATH), config.video_format > 0);
-					EnableWindow(GetDlgItem(hwnd, AVI_BROWSE), config.video_format > 0);
+					EnableWindow(GetDlgItem(hwnd, AVI_PATH), config.video_format > 0 || config.audio_format > 0);
+					EnableWindow(GetDlgItem(hwnd, AVI_BROWSE), config.video_format > 0 || config.audio_format > 0);
 					
 					return TRUE;
 				}
 				else if(LOWORD(wp) == AUDIO_FORMAT_MENU)
 				{
 					config.audio_format = ComboBox_GetCurSel(GetDlgItem(hwnd, AUDIO_FORMAT_MENU));
+
+					goto VIDEO_ENABLE;
 				}
 			}
 		}
@@ -843,7 +844,7 @@ int main(int argc, char **argv)
 	update_wa_info();
 	
 	config.video_format = std::max(get_ffmpeg_index(video_formats, reg.get_string("selected_encoder", "H264")), 0);
-	config.audio_format = std::max(get_ffmpeg_index(audio_formats, reg.get_string("audio_format")), 0);
+	config.audio_format = std::max(get_ffmpeg_index(audio_formats, reg.get_string("audio_format", "AAC")), 0);
 	
 	config.width = reg.get_dword("res_x", 640);
 	config.height = reg.get_dword("res_y", 480);
