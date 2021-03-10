@@ -288,7 +288,9 @@ static void update_wa_info()
 static void toggle_clipping(HWND hwnd)
 {
 	bool enabled = checkbox_get(GetDlgItem(hwnd, FIX_CLIPPING));
-	
+
+	config.fix_clipping = enabled;
+
 	EnableWindow(GetDlgItem(hwnd, MIN_VOL_SLIDER), enabled);
 	EnableWindow(GetDlgItem(hwnd, MIN_VOL_EDIT), enabled);
 }
@@ -369,13 +371,13 @@ INT_PTR CALLBACK main_dproc(HWND hwnd, UINT msg, WPARAM wp, LPARAM lp)
 			ComboBox_SetCurSel(chat_list, config.wa_chat_behaviour);
 			set_combo_height(chat_list);
 			
-			Button_SetCheck(GetDlgItem(hwnd, DO_CLEANUP), (config.do_cleanup ? BST_CHECKED : BST_UNCHECKED));
+			checkbox_set(GetDlgItem(hwnd, DO_CLEANUP), config.do_cleanup);
 			
 			/* Audio settings... */
 			
 			volume_init(GetDlgItem(hwnd, INIT_VOL_SLIDER), GetDlgItem(hwnd, INIT_VOL_EDIT), config.init_vol);
 			
-			checkbox_set(GetDlgItem(hwnd, FIX_CLIPPING), true);
+			checkbox_set(GetDlgItem(hwnd, FIX_CLIPPING), config.fix_clipping);
 			toggle_clipping(hwnd);
 			
 			volume_init(GetDlgItem(hwnd, MIN_VOL_SLIDER), GetDlgItem(hwnd, MIN_VOL_EDIT), config.min_vol);
@@ -464,7 +466,7 @@ INT_PTR CALLBACK main_dproc(HWND hwnd, UINT msg, WPARAM wp, LPARAM lp)
 						config.wa_detail_level = ComboBox_GetCurSel(GetDlgItem(hwnd, WA_DETAIL));
 						config.wa_chat_behaviour = ComboBox_GetCurSel(GetDlgItem(hwnd, WA_CHAT));
 						
-						config.do_cleanup = Button_GetCheck(GetDlgItem(hwnd, DO_CLEANUP));
+						config.do_cleanup = checkbox_get(GetDlgItem(hwnd, DO_CLEANUP));
 						
 						/* Audio settings... */
 						
@@ -534,7 +536,7 @@ INT_PTR CALLBACK main_dproc(HWND hwnd, UINT msg, WPARAM wp, LPARAM lp)
 						openfile.lpstrFilter = "Worms Armageddon replay (*.WAgame)\0*.WAgame\0All Files\0*\0";
 						openfile.lpstrFile = filename;
 						openfile.nMaxFile = sizeof(filename);
-						openfile.lpstrInitialDir = (config.replay_dir.length() ? config.replay_dir.c_str() : NULL);
+						openfile.lpstrInitialDir = (config.replay_dir.length() ? config.replay_dir.c_str() : (wa_path + "\\User\\Games").c_str());
 						openfile.lpstrTitle = "Select replay";
 						openfile.Flags = OFN_FILEMUSTEXIST | OFN_HIDEREADONLY;
 						
@@ -542,7 +544,17 @@ INT_PTR CALLBACK main_dproc(HWND hwnd, UINT msg, WPARAM wp, LPARAM lp)
 						{
 							config.replay_file = filename;
 							SetWindowText(GetDlgItem(hwnd, REPLAY_PATH), config.replay_file.c_str());
-							SetWindowText(GetDlgItem(hwnd, AVI_PATH), (config.replay_file + ".mp4").c_str());
+
+							if(config.video_dir.length())
+							{
+								std::string dir = config.video_dir + "\\";
+								std::string file = config.replay_file;
+								file.erase(0, file.find_last_of('\\') + 1);
+								config.video_file = dir + file + ".mp4";
+							}else{
+								config.video_file = config.replay_file + ".mp4";
+							}
+							SetWindowText(GetDlgItem(hwnd, AVI_PATH), config.video_file.c_str());
 							
 							config.replay_dir = config.replay_file;
 							config.replay_dir.erase(config.replay_dir.find_last_of('\\'));
@@ -555,6 +567,12 @@ INT_PTR CALLBACK main_dproc(HWND hwnd, UINT msg, WPARAM wp, LPARAM lp)
 						break;
 					}
 					
+					case DO_CLEANUP:
+					{
+						config.do_cleanup = checkbox_get(GetDlgItem(hwnd, DO_CLEANUP));
+						break;
+					}
+
 					case FIX_CLIPPING:
 					{
 						toggle_clipping(hwnd);
@@ -709,12 +727,14 @@ INT_PTR CALLBACK main_dproc(HWND hwnd, UINT msg, WPARAM wp, LPARAM lp)
 				case INIT_VOL_SLIDER:
 				{
 					volume_on_slider((HWND)(lp), GetDlgItem(hwnd, INIT_VOL_EDIT));
+					config.init_vol = SendMessage(GetDlgItem(hwnd, INIT_VOL_SLIDER), TBM_GETPOS, (WPARAM)(0), (LPARAM)(0));
 					break;
 				}
 				
 				case MIN_VOL_SLIDER:
 				{
 					volume_on_slider((HWND)(lp), GetDlgItem(hwnd, MIN_VOL_EDIT));
+					config.min_vol = SendMessage(GetDlgItem(hwnd, MIN_VOL_SLIDER), TBM_GETPOS, (WPARAM)(0), (LPARAM)(0));
 					break;
 				}
 			}
@@ -822,7 +842,7 @@ int main(int argc, char **argv)
 	config.load_wormkit_dlls = reg.get_dword("load_wormkit_dlls", false);
 	update_wa_info();
 	
-	config.video_format = std::max(get_ffmpeg_index(video_formats, reg.get_string("selected_encoder", "Uncompressed AVI")), 0);
+	config.video_format = std::max(get_ffmpeg_index(video_formats, reg.get_string("selected_encoder", "H264")), 0);
 	config.audio_format = std::max(get_ffmpeg_index(audio_formats, reg.get_string("audio_format")), 0);
 	
 	config.width = reg.get_dword("res_x", 640);
@@ -835,8 +855,8 @@ int main(int argc, char **argv)
 	config.wa_detail_level = reg.get_dword("wa_detail_level", 0);
 	config.wa_chat_behaviour = reg.get_dword("wa_chat_behaviour", 0);
 	config.wa_lock_camera = reg.get_dword("wa_lock_camera", true);
-	config.wa_bigger_fonts = reg.get_dword("wa_bigger_fonts", true);
-	config.wa_transparent_labels = reg.get_dword("wa_transparent_labels", false);
+	config.wa_bigger_fonts = reg.get_dword("wa_bigger_fonts", false);
+	config.wa_transparent_labels = reg.get_dword("wa_transparent_labels", true);
 	
 	config.do_cleanup = reg.get_dword("do_cleanup", true);
 	
@@ -848,8 +868,10 @@ int main(int argc, char **argv)
 	config.replay_dir = reg.get_string("replay_dir");
 	config.video_dir = reg.get_string("video_dir");
 	
-	while(DialogBox(GetModuleHandle(NULL), MAKEINTRESOURCE(DLG_MAIN), NULL, &main_dproc))
+	while(true)
 	{
+		auto res = DialogBox(GetModuleHandle(NULL), MAKEINTRESOURCE(DLG_MAIN), NULL, &main_dproc);
+
 		reg.set_string("selected_encoder", video_formats[config.video_format].name);
 		reg.set_string("audio_format", audio_formats[config.audio_format].name);
 		
@@ -879,12 +901,16 @@ int main(int argc, char **argv)
 		reg.set_string("wa_path", wa_path);
 		reg.set_string("wa_exe_name", wa_exe_name);
 		reg.set_dword("load_wormkit_dlls", config.load_wormkit_dlls);
-		
+
+		if(!res) {
+			break;
+		}
+
 		if(!DialogBox(GetModuleHandle(NULL), MAKEINTRESOURCE(DLG_PROGRESS), NULL, &prog_dproc)) {
 			break;
 		}
 	}
-	
+
 	if(com_init) {
 		CoUninitialize();
 	}
