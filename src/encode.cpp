@@ -107,9 +107,9 @@ static void append_codec(std::string &cmdline, const char *ct, const ffmpeg_form
 
 std::string ffmpeg_cmdline()
 {
-	std::string frames_in = escape_filename(config.capture_dir + "\\" + FRAME_PREFIX + "%06d.png");
-	std::string audio_in  = escape_filename(config.capture_dir + "\\" + FRAME_PREFIX + "audio.wav");
-	std::string video_out = escape_filename(config.video_file);
+	std::string frames_in = config.capture_dir + "\\" + FRAME_PREFIX + "%06d.png";
+	std::string audio_in  = config.capture_dir + "\\" + FRAME_PREFIX + "audio.wav";
+	std::string video_out = config.video_file;
 	
 	std::string cmdline = "ffmpeg.exe -threads " + to_string(config.max_enc_threads) + " -y -r " + to_string(config.frame_rate) + " -i \"" + frames_in + "\"";
 	
