@@ -37,7 +37,7 @@ MENU_MAIN MENU
 LANGUAGE LANG_NEUTRAL, SUBLANG_NEUTRAL
 DLG_MAIN DIALOG 0, 0, 309, 249
 STYLE DS_3DLOOK | DS_CENTER | DS_MODALFRAME | DS_SHELLFONT | WS_CAPTION | WS_VISIBLE | WS_POPUP | WS_SYSMENU
-CAPTION "Armageddon MP4 Recorder 1.0"
+CAPTION "Armageddon MP4 Recorder 1.1"
 MENU MENU_MAIN
 FONT 8, "Ms Shell Dlg"
 {
@@ -101,7 +101,7 @@ FONT 8, "Ms Shell Dlg"
 LANGUAGE LANG_NEUTRAL, SUBLANG_NEUTRAL
 DLG_PROGRESS DIALOG 0, 0, 365, 123
 STYLE DS_3DLOOK | DS_CENTER | DS_MODALFRAME | DS_SHELLFONT | WS_CAPTION | WS_VISIBLE | WS_POPUP | WS_SYSMENU
-CAPTION "Armageddon MP4 Recorder 1.0 - Working..."
+CAPTION "Armageddon MP4 Recorder 1.1 - Working..."
 FONT 8, "Ms Shell Dlg"
 {
     DEFPUSHBUTTON   "OK", IDOK, 310, 105, 50, 14, WS_DISABLED
@@ -137,8 +137,8 @@ LANGUAGE LANG_NEUTRAL, SUBLANG_NEUTRAL
 
 
 VS_VERSION_INFO VERSIONINFO
-FILEVERSION 1,0,0,0
-PRODUCTVERSION 1,0,0,0
+FILEVERSION 1,1,0,0
+PRODUCTVERSION 1,1,0,0
 FILEFLAGSMASK 0x3fL
 #if _DEBUG
 FILEFLAGS 0x1L
@@ -158,14 +158,14 @@ BEGIN
 #else
             VALUE "FileDescription", "Records WAgame replay to mp4 video"
 #endif
-            VALUE "FileVersion", "1.0.0.0"
+            VALUE "FileVersion", "1.1.0.0"
             VALUE "InternalName", "armageddon-mp4-recorder.exe"
             VALUE "OriginalFilename", "armageddon-mp4-recorder.exe"
             VALUE "ProductName", "armageddon-mp4-recorder.exe"
 #if _DEBUG
             VALUE "ProductVersion", "DEBUG"
 #else
-            VALUE "ProductVersion", "1.0.0.0"
+            VALUE "ProductVersion", "1.1.0.0"
 #endif
         END
     END
