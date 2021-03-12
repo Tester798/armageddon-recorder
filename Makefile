@@ -25,7 +25,7 @@ WINDRES ?= $(shell \
 )
 
 INCLUDES := -D_WIN32_WINNT=0x0501 -DWINVER=0x0501 -D_WIN32_IE=0x0600 -I./include/ -I../directx/
-LIBS     := -static -static-libgcc -static-libstdc++ -L./include/ -lcomctl32 -lcomdlg32 -lole32 -lsndfile.dll -lversion
+LIBS     := -static -static-libgcc -static-libstdc++ -L./include/ -lcomctl32 -lcomdlg32 -lole32 -lsndfile -lversion
 
 CFLAGS   := -Wall -std=c99
 CXXFLAGS := -Wall -std=c++0x
@@ -44,9 +44,8 @@ clean:
 	rm -f dump.exe src/dump.o
 
 armageddon-mp4-recorder.exe: $(OBJS)
-	$(CXX) $(CXXFLAGS) -mwindows -o armageddon-mp4-recorder.exe $(OBJS) $(LIBS)
+	$(CXX) $(CXXFLAGS) -static -mwindows -o armageddon-mp4-recorder.exe $(OBJS) $(LIBS)
 	strip -s armageddon-mp4-recorder.exe
-	strip -s libsndfile-1.dll
 
 dump.exe: src/dump.o
 	$(CXX) $(CXXFLAGS) -o $@ $< $(LIBS)
