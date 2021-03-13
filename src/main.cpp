@@ -864,7 +864,7 @@ int main(int argc, char **argv)
 	config.init_vol     = reg.get_dword("init_vol", 100);
 	
 	config.fix_clipping = reg.get_dword("fix_clipping", true);
-	config.min_vol      = reg.get_dword("min_vol", 40);
+	config.min_vol      = reg.get_dword("min_vol", 30);
 	
 	config.replay_dir = reg.get_string("replay_dir");
 	config.video_dir = reg.get_string("video_dir");
