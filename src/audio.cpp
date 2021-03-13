@@ -153,7 +153,7 @@ struct audio_buffer
 				ret.push_back(resample_out[so++] * gain);
 			}
 			else{
-				ret.push_back(0);
+				ret.push_back(ret.back());
 			}
 			
 			if(channels >= 2 && so < resample_out.size())
