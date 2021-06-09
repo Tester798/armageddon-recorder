@@ -19,6 +19,7 @@
 #include <windowsx.h>
 #include <commctrl.h>
 #include <assert.h>
+#include <time.h>
 
 #include "main.hpp"
 #include "ui.hpp"
@@ -26,6 +27,15 @@
 #include "resource.h"
 #include "encode.hpp"
 #include "audio.hpp"
+
+const std::string currentTime() {
+	time_t now = time(0);
+	struct tm tstruct;
+	char buf[100];
+	tstruct = *localtime(&now);
+	strftime(buf, sizeof(buf), "%X", &tstruct);
+	return buf;
+}
 
 HWND progress_dialog = NULL;
 
@@ -364,7 +374,8 @@ INT_PTR CALLBACK prog_dproc(HWND hwnd, UINT msg, WPARAM wp, LPARAM lp)
 
 /* Append text to the progress dialog log window */
 void log_push(const std::string &msg) {
-	SendMessage(progress_dialog, WM_PUSHLOG, (WPARAM)&msg, 0);
+	const std::string logmsg = currentTime() + " " + msg;
+	SendMessage(progress_dialog, WM_PUSHLOG, (WPARAM)&logmsg, 0);
 }
 
 void show_error(const std::string &msg)
