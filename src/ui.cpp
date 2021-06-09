@@ -19,7 +19,6 @@
 #include <windowsx.h>
 #include <commctrl.h>
 #include <assert.h>
-#include <time.h>
 
 #include "main.hpp"
 #include "ui.hpp"
