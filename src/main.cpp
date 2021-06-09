@@ -849,7 +849,7 @@ int main(int argc, char **argv)
 	config.width = reg.get_dword("res_x", 640);
 	config.height = reg.get_dword("res_y", 480);
 	
-	config.frame_rate = reg.get_dword("frame_rate", 50);
+	config.frame_rate = reg.get_dword("frame_rate", 60);
 	
 	config.max_enc_threads = reg.get_dword("max_enc_threads", 0);
 	
@@ -864,7 +864,7 @@ int main(int argc, char **argv)
 	config.init_vol     = reg.get_dword("init_vol", 100);
 	
 	config.fix_clipping = reg.get_dword("fix_clipping", true);
-	config.min_vol      = reg.get_dword("min_vol", 30);
+	config.min_vol      = reg.get_dword("min_vol", 10);
 	
 	config.replay_dir = reg.get_string("replay_dir");
 	config.video_dir = reg.get_string("video_dir");
