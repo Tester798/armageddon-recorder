@@ -352,6 +352,8 @@ bool make_output_wav()
 			background_buffers.insert(std::make_pair(i->first,new_buffer));
 		}
 	}
+
+	log_push("Processing audio...\r\n");
 	
 	std::map<unsigned int, audio_buffer> buffers;
 	
