@@ -27,8 +27,8 @@ WINDRES ?= $(shell \
 INCLUDES := -D_WIN32_WINNT=0x0501 -DWINVER=0x0501 -D_WIN32_IE=0x0600 -I./include/ -I../directx/
 LIBS     := -static -static-libgcc -static-libstdc++ -L./include/ -lcomctl32 -lcomdlg32 -lole32 -lsndfile -lversion
 
-CFLAGS   := -Wall -std=c99
-CXXFLAGS := -Wall -std=c++0x
+CFLAGS   := -Wall -std=c99 -O3
+CXXFLAGS := -Wall -std=c++0x -O3
 
 OBJS := src/main.o src/resource.o src/audio.o src/reg.o src/encode.o \
 	src/capture.o src/ui.o
