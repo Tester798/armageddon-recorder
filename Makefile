@@ -59,7 +59,7 @@ dsound.dll: src/ds-capture.o
 	strip -s dsound.dll
 
 src/ds-capture.o: src/ds-capture.c
-	$(CC) $(CFLAGS) $(INCLUDES) -c -o $@ $<
+	$(CC) $(filter-out -O3, $(CFLAGS)) $(INCLUDES) -c -o $@ $<
 
 src/%.o: src/%.cpp $(HDRS)
 	$(CXX) $(CXXFLAGS) $(INCLUDES) -c -o $@ $<
