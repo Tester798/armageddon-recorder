@@ -849,7 +849,7 @@ int main(int argc, char **argv)
 	config.width = reg.get_dword("res_x", 640);
 	config.height = reg.get_dword("res_y", 480);
 	
-	config.frame_rate = reg.get_dword("frame_rate", 60);
+	config.frame_rate = reg.get_dword("frame_rate", 50);
 	
 	config.max_enc_threads = reg.get_dword("max_enc_threads", 0);
 	
